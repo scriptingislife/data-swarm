@@ -47,7 +47,7 @@ EOF
 resource "aws_iam_policy_attachment" "2fa_sns_attach" {
     name = "2fa_sns_attach"
     roles = ["${aws_iam_role.2fa_lambda_role.name}"]
-    policy_arn = "${}"
+    policy_arn = "${}" # TODO
 }
 
 resource "aws_lambda_function" "swarm_manager" {
@@ -58,6 +58,11 @@ resource "aws_lambda_function" "swarm_manager" {
     handler = "main.handler"
     runtime = "python3.7"
     timeout = "5"
+    environment {
+        variables = {
+            SWARM_SNS_TOPIC_ARN = "${aws_sns_topic.2fa_swarm.arn}"
+        }
+    }
 }
 
 resource "aws_lambda_function" "swarm_worker" {
