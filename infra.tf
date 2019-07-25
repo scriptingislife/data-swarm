@@ -83,16 +83,46 @@ resource "aws_iam_policy" "SNSRead" {
 EOF
 }
 
+resource "aws_iam_policy" "Cloudwatch" {
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:*"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_iam_policy_attachment" "2fa_sns_publish" {
     name = "2fa_sns_publish"
     roles = ["${aws_iam_role.2fa_lambda_manager.name}"]
     policy_arn = "${aws_iam_policy.SNSPublish.arn}"
 }
 
+
+resource "aws_iam_policy_attachment" "2fa_cloudwatch_manager" {
+    name= "2fa_cloudwatch_manager"
+    roles = ["${aws_iam_role.2fa_lambda_manager.name}"]
+    policy_arn = "${aws_iam_policy.Cloudwatch.arn}"
+}
+
 resource "aws_iam_policy_attachment" "2fa_sns_read" {
     name = "2fa_sns_read"
     roles = ["${aws_iam_role.2fa_lambda_worker.name}"]
     policy_arn = "${aws_iam_policy.SNSRead.arn}"
+}
+
+resource "aws_iam_policy_attachment" "2fa_cloudwatch_worker" {
+    name= "2fa_cloudwatch_worker"
+    roles = ["${aws_iam_role.2fa_lambda_worker.name}"]
+    policy_arn = "${aws_iam_policy.Cloudwatch.arn}"
 }
 
 resource "aws_lambda_function" "swarm_manager" {
