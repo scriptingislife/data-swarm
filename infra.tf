@@ -6,6 +6,18 @@ resource "aws_sns_topic" "2fa_swarm" {
     name = "2fa-swarm"
 }
 
+resource "aws_dynamodb_table" "2fa_db_table" {
+    name = "2FA-Swarm"
+    hash_key = "uuid"
+    read_capacity = 5
+    write_capacity = 5
+
+    attribute {
+        name = "uuid"
+        type = "S"
+    }
+}
+
 resource "aws_iam_role" "2fa_lambda_manager" {
     name = "2fa_lambda_manager"
     assume_role_policy = <<EOF
@@ -94,6 +106,21 @@ EOF
 }
 
 
+resource "aws_iam_policy" "dynamodb_worker" {
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "dynamodb:PutItem",
+            "Resource": "${aws_dynamodb_table.2fa_db_table.arn}"
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_iam_policy_attachment" "2fa_sns_publish" {
     name = "2fa_sns_publish"
     roles = ["${aws_iam_role.2fa_lambda_manager.name}"]
@@ -111,6 +138,12 @@ resource "aws_iam_policy_attachment" "2fa_cloudwatch_worker" {
     name= "2fa_cloudwatch_worker"
     roles = ["${aws_iam_role.2fa_lambda_worker.name}"]
     policy_arn = "${aws_iam_policy.cloudwatch_worker.arn}"
+}
+
+resource "aws_iam_policy_attachment" "2fa_db_worker" {
+    name = "2fa_db_worker"
+    roles = ["${aws_iam_role.2fa_lambda_worker.name}"]
+    policy_arn = "${aws_iam_policy.dynamodb_worker.arn}"
 }
 
 resource "aws_lambda_function" "swarm_manager" {

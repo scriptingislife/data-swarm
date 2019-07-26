@@ -6,7 +6,7 @@ pack-manager:
 	mkdir build; \
 	cp main.py build/; \
 	mkdir build/lib; \
-	pip install -r requirements.txt -t build/lib/.; \
+	pip3 install -r requirements.txt -t build/lib/.; \
 	cd build; zip -9qr build.zip .; \
 
 pack-worker:
