@@ -59,31 +59,7 @@ resource "aws_iam_policy" "SNSPublish" {
 EOF
 }
 
-resource "aws_iam_policy" "SNSRead" {
-    policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "sns:ListTagsForResource",
-                "sns:ListPhoneNumbersOptedOut",
-                "sns:GetEndpointAttributes",
-                "sns:GetTopicAttributes",
-                "sns:GetPlatformApplicationAttributes",
-                "sns:GetSubscriptionAttributes",
-                "sns:GetSMSAttributes",
-                "sns:CheckIfPhoneNumberIsOptedOut"
-            ],
-            "Resource": "${aws_sns_topic.2fa_swarm.arn}"
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "Cloudwatch" {
+resource "aws_iam_policy" "cloudwatch_manager" {
     policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -100,6 +76,24 @@ resource "aws_iam_policy" "Cloudwatch" {
 EOF
 }
 
+resource "aws_iam_policy" "cloudwatch_worker" {
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:*"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+        }
+    ]
+}
+EOF
+}
+
+
 resource "aws_iam_policy_attachment" "2fa_sns_publish" {
     name = "2fa_sns_publish"
     roles = ["${aws_iam_role.2fa_lambda_manager.name}"]
@@ -110,19 +104,13 @@ resource "aws_iam_policy_attachment" "2fa_sns_publish" {
 resource "aws_iam_policy_attachment" "2fa_cloudwatch_manager" {
     name= "2fa_cloudwatch_manager"
     roles = ["${aws_iam_role.2fa_lambda_manager.name}"]
-    policy_arn = "${aws_iam_policy.Cloudwatch.arn}"
-}
-
-resource "aws_iam_policy_attachment" "2fa_sns_read" {
-    name = "2fa_sns_read"
-    roles = ["${aws_iam_role.2fa_lambda_worker.name}"]
-    policy_arn = "${aws_iam_policy.SNSRead.arn}"
+    policy_arn = "${aws_iam_policy.cloudwatch_manager.arn}"
 }
 
 resource "aws_iam_policy_attachment" "2fa_cloudwatch_worker" {
     name= "2fa_cloudwatch_worker"
     roles = ["${aws_iam_role.2fa_lambda_worker.name}"]
-    policy_arn = "${aws_iam_policy.Cloudwatch.arn}"
+    policy_arn = "${aws_iam_policy.cloudwatch_worker.arn}"
 }
 
 resource "aws_lambda_function" "swarm_manager" {
@@ -154,4 +142,12 @@ resource "aws_sns_topic_subscription" "2fa_swarm_target" {
     topic_arn = "${aws_sns_topic.2fa_swarm.arn}"
     protocol = "lambda"
     endpoint = "${aws_lambda_function.swarm_worker.arn}"
+}
+
+resource "aws_lambda_permission" "sns_trigger" {
+    statement_id = "AllowExecutionFromSNS"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.swarm_worker.arn}"
+    principal = "sns.amazonaws.com"
+    source_arn = "${aws_sns_topic.2fa_swarm.arn}"
 }
