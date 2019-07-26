@@ -3,10 +3,12 @@ import json
 import os
 
 def handler(event, context):
-    message = {
+    payload = {
         'host': event['host'],
-        'body': event['body'],
-        'default': 'default'
+        'body': event['body']
+    }
+    message = {
+        'default': json.dumps(payload)
     }
 
     #arn = 'arn:aws:sns:us-east-1:358663747217:2fa-swarm'
