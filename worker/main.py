@@ -23,7 +23,7 @@ def handler(event, context):
             resp = ''
             while len(data):
                 data = s.recv(1)
-                if data = b'\r':
+                if data == b'\r':
                     break
                 resp += data.decode()
     except Exception as e:
@@ -32,12 +32,6 @@ def handler(event, context):
 
     status_code = int(resp.split(' ')[1])
 
+    table.put_item(Item={"uuid": str(uuid.uuid4()), "status_code": status_code})
 
-    decoded = data.decode()
-    obj = json.loads(decoded[decoded.index('{'):decoded.index('}') + 1].strip())
-    ip = obj['origin'][:obj['origin'].index(',')]
-
-    table.put_item(Item={"uuid": str(uuid.uuid4()), "ip": ip})
-
-    print(ip)
-    return {'response': ip}
+    return {'status_code': status_code}
