@@ -24,8 +24,11 @@ def handler(event, context):
             'body': event['body']
         }
     }
-    message = json.dumps(payload)
+    message = {
+        'default': json.dumps(payload)
+    }
 
+    threading_msg = json.dumps(message)
 
     #arn = 'arn:aws:sns:us-east-1:358663747217:2fa-swarm'
     arn = os.environ.get('SWARM_SNS_TOPIC_ARN')
@@ -34,7 +37,7 @@ def handler(event, context):
     if 'times' in event.keys():
         for _ in range(int(event['times'])):
             try:
-                t = LaunchThread(client, arn, message)
+                t = LaunchThread(client, arn, threading_msg)
                 t.start()
             except Exception as e:
                 print(e)
