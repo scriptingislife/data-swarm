@@ -153,7 +153,7 @@ resource "aws_lambda_function" "swarm_manager" {
     role = "${aws_iam_role.2fa_lambda_manager.arn}"
     handler = "main.handler"
     runtime = "python3.7"
-    timeout = "30"
+    timeout = "5"
     environment {
         variables = {
             SWARM_SNS_TOPIC_ARN = "${aws_sns_topic.2fa_swarm.arn}"
@@ -169,11 +169,6 @@ resource "aws_lambda_function" "swarm_worker" {
     handler = "main.handler"
     runtime = "python3.7"
     timeout = "5"
-    environment {
-        variables = {
-            DB_NAME = "${aws_dynamodb_table.2fa_db_table.name}"
-        }
-    }
 }
 
 resource "aws_sns_topic_subscription" "2fa_swarm_target" {
