@@ -2,6 +2,7 @@ import socket
 import json
 import boto3
 import uuid
+import os
 
 def handler(event, context):
     message = json.loads(event['Records'][0]['Sns']['Message'])
@@ -13,7 +14,7 @@ def handler(event, context):
         port = 80
 
     resource = boto3.resource('dynamodb')
-    table = resource.Table('2FA-Swarm')
+    table = resource.Table(os.environ['DB_NAME'])
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
