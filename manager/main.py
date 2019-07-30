@@ -7,6 +7,10 @@ def handler(event, context):
         'host': event['host'],
         'body': event['body']
     }
+
+    if 'port' in event.keys():
+        payload['port'] = event['port']
+
     message = {
         'default': json.dumps(payload)
     }
