@@ -4,7 +4,8 @@ import boto3
 import uuid
 
 def handler(event, context):
-    message = json.loads(event['Records'][0]['Sns']['Message'])
+    #message = json.loads(event['Records'][0]['Sns']['Message'])
+    message = event
     host = message['host']
     body = message['body'].encode('ascii')
     try:
