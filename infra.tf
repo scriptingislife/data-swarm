@@ -153,7 +153,7 @@ resource "aws_lambda_function" "swarm_manager" {
     role = "${aws_iam_role.2fa_lambda_manager.arn}"
     handler = "main.handler"
     runtime = "python3.7"
-    timeout = "30"
+    timeout = "60"
     environment {
         variables = {
             SWARM_SNS_TOPIC_ARN = "${aws_sns_topic.2fa_swarm.arn}"
