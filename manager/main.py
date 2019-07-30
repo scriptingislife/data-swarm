@@ -16,15 +16,17 @@ def handler(event, context):
     }
 
     arn = os.environ.get('SWARM_SNS_TOPIC_ARN')
-    client = boto3.client('sns')
+    #client = boto3.client('sns')
+    client = boto3.client('lambda')
 
     if 'times' in event.keys():
         for _ in range(int(event['times'])):
-                client.publish(
-            TargetArn=arn,
-            Message=json.dumps(message),
-            MessageStructure='json'
-            )
+            client.invoke(FunctionName='2fa_swarm_worker', InvocationType='Event', Payload=json.dumps('message'))
+            #     client.publish(
+            # TargetArn=arn,
+            # Message=json.dumps(message),
+            # MessageStructure='json'
+            # )
         response = 'success'
     else:
         response = client.publish(

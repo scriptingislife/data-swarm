@@ -154,6 +154,7 @@ resource "aws_lambda_function" "swarm_manager" {
     handler = "main.handler"
     runtime = "python3.7"
     timeout = "60"
+    memory_size = 3008
     environment {
         variables = {
             SWARM_SNS_TOPIC_ARN = "${aws_sns_topic.2fa_swarm.arn}"
