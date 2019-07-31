@@ -5,11 +5,11 @@ import uuid
 
 def handler(event, context):
     #message = json.loads(event['Records'][0]['Sns']['Message'])
-    message = event
-    host = message['host']
-    body = message['body'].encode('ascii')
+    print(event)
+    host = event['host']
+    body = event['body'].encode('ascii')
     try:
-        port = int(message['port'])
+        port = int(event['port'])
     except KeyError:
         port = 80
 

@@ -21,7 +21,7 @@ def handler(event, context):
 
     if 'times' in event.keys():
         for _ in range(int(event['times'])):
-            client.invoke(FunctionName='2fa_swarm_worker', InvocationType='Event', Payload=json.dumps('message'))
+            client.invoke(FunctionName='2fa_swarm_worker', InvocationType='Event', Payload=json.dumps(payload))
             #     client.publish(
             # TargetArn=arn,
             # Message=json.dumps(message),

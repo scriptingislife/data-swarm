@@ -71,6 +71,21 @@ resource "aws_iam_policy" "SNSPublish" {
 EOF
 }
 
+resource "aws_iam_policy" "LambdaInvoke" {
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "lambda:InvokeFunction",
+            "Resource": "${aws_lambda_function.swarm_worker.arn}"
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_iam_policy" "cloudwatch_manager" {
     policy = <<EOF
 {
@@ -144,6 +159,12 @@ resource "aws_iam_policy_attachment" "2fa_db_worker" {
     name = "2fa_db_worker"
     roles = ["${aws_iam_role.2fa_lambda_worker.name}"]
     policy_arn = "${aws_iam_policy.dynamodb_worker.arn}"
+}
+
+resource "aws_iam_policy_attachment" "2fa_manager_invoke" {
+    name = "2fa_manager_invoke"
+    roles = ["${aws_iam_role.2fa_lambda_manager.name}"]
+    policy_arn = "${aws_iam_policy.LambdaInvoke.arn}"
 }
 
 resource "aws_lambda_function" "swarm_manager" {
