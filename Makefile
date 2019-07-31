@@ -1,6 +1,3 @@
-#
-#
-#
 pack-manager:
 	cd manager; \
 	mkdir build; \

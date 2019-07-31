@@ -1,2 +1,3 @@
-# 2fa-swarm
-Create a swarm of serverless functions to bruteforce a 2FA code
+# Data Swarm
+
+Send TCP data to a remote host from multiple IPs using a swarm of AWS Lambda functions.
